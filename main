@@ -52,7 +52,7 @@ void loop() {
     } else if (state == 3) {
       digitalWrite(led1, HIGH); // LED 1 on
       digitalWrite(led2, HIGH); // LED 2 on
-      ledcWrite(pwmChannel, 1023); // Motor full speed
+      ledcWrite(pwmChannel, 1023); // Motor full speeeed
       digitalWrite(motorPin2, LOW);
     }
 
