@@ -1,0 +1,65 @@
+// Define pin numbers for the LEDs, the button, and the motor
+int led1 = D5; // Pin for LED 1
+int led2 = D6; // Pin for LED 2
+int button = D7; // Pin connected to the push button
+int motorPin1 = D8; // Input pin 1 for the motor
+int motorPin2 = D9; // Input pin 2 for the motor
+
+// Variable to track the current state of the LEDs
+int state = 0;
+
+// Define the PWM channel, frequency, and resolution
+int pwmChannel = 0;
+int freq = 5000; // Frequency in Hz
+int resolution = 10; // Resolution in bits
+
+void setup() {
+  Serial.begin(115200); // Start serial communication at 115200 baud rate
+  pinMode(led1, OUTPUT); // Set LED 1 as an output
+  pinMode(led2, OUTPUT); // Set LED 2 as an output
+  pinMode(button, INPUT); // Set the button pin as an input
+  pinMode(motorPin1, OUTPUT); // Set the motor pin 1 as an output
+  pinMode(motorPin2, OUTPUT); // Set the motor pin 2 as an output
+
+  // Setup PWM
+  ledcSetup(pwmChannel, freq, resolution);
+  ledcAttachPin(motorPin1, pwmChannel);
+}
+ 
+void loop() {
+  int buttonState = digitalRead(button); // Read the state of the button
+
+  // Check if the button is pressed
+  if(buttonState == HIGH) {
+    state = (state + 1) % 4; // Increment the state and wrap around after 3
+
+    // Control LEDs and motor speed based on the current state using an if-else statement
+    if (state == 0) {
+      digitalWrite(led1, LOW);  // LED 1 off
+      digitalWrite(led2, LOW);  // LED 2 off
+      ledcWrite(pwmChannel, 0); // Motor off
+      digitalWrite(motorPin2, LOW);
+    } else if (state == 1) {
+      digitalWrite(led1, HIGH); // LED 1 on
+      digitalWrite(led2, LOW);  // LED 2 off
+      ledcWrite(pwmChannel, 256); // Motor 1/4 speed
+      digitalWrite(motorPin2, LOW);
+    } else if (state == 2) {
+      digitalWrite(led1, LOW);  // LED 1 off
+      digitalWrite(led2, HIGH); // LED 2 on
+      ledcWrite(pwmChannel, 512); // Motor half speed
+      digitalWrite(motorPin2, LOW);
+    } else if (state == 3) {
+      digitalWrite(led1, HIGH); // LED 1 on
+      digitalWrite(led2, HIGH); // LED 2 on
+      ledcWrite(pwmChannel, 1023); // Motor full speed
+      digitalWrite(motorPin2, LOW);
+    }
+
+    Serial.println("State changed"); // Print state change to the serial monitor
+    delay(500); // Debounce delay to avoid multiple rapid state changes
+
+    // Wait until the button is released to avoid repeated state changes
+    while(digitalRead(button) == HIGH); 
+  }
+}
