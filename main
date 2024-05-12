@@ -10,13 +10,14 @@ int motorPin2 = D1; // Input pin 2 for the motor
 int state = 0;
 
 void setup() {
+  ledcSetup(0, 5000, 13); // 13-bit resolution
+  ledcAttachPin(motorPin1, 0); // attach the channel to the GPIO to be controlled
+
   Serial.begin(115200); // Start serial communication at 115200 baud rate
   pinMode(led1, OUTPUT); // Set LED 1 as an output
   pinMode(led2, OUTPUT); // Set LED 2 as an output
   pinMode(button1, INPUT); // Set the first button pin as an input
   pinMode(button2, INPUT); // Set the second button pin as an input
-  pinMode(motorPin1, OUTPUT); // Set the motor pin 1 as an output
-  pinMode(motorPin2, OUTPUT); // Set the motor pin 2 as an output
 }
  
 void loop() {
@@ -53,17 +54,13 @@ void loop() {
   if(buttonState2 == HIGH) {
     // Control motor based on the current state using an if-else statement
     if (state == 0) {
-      analogWrite(motorPin1, 0); // Motor off
-      digitalWrite(motorPin2, LOW);
+      ledcWrite(0, 0); // Motor off
     } else if (state == 1) {
-      analogWrite(motorPin1, 64); // Motor 1/4 speed
-      digitalWrite(motorPin2, LOW);
+      ledcWrite(0, 3276); // Motor half speed (3276 is 1/2 of 6553)
     } else if (state == 2) {
-      analogWrite(motorPin1, 128); // Motor half speed
-      digitalWrite(motorPin2, LOW);
+      ledcWrite(0, 4919); // Motor 3/4 speed (4919 is 3/4 of 6553)
     } else if (state == 3) {
-      analogWrite(motorPin1, 255); // Motor full speed
-      digitalWrite(motorPin2, LOW);
+      ledcWrite(0, 6553); // Motor full speed (6553 is full of 6553)
     }
     delay(500); // Debounce delay to avoid multiple rapid state changes
     // Wait until the button is released to avoid repeated state changes
